@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dell Boomi Sample Process Component
+  Process Name : Sample_HTTP_To_FlatFile_Integration
+  Description  : Reads JSON data from an HTTP endpoint, maps it to a flat-file
+                 (CSV) profile, and writes the output to disk.
+  Boomi Version: Runtime 23.x+
+-->
+<bns:Component
+  xmlns:bns="http://api.platform.boomi.com/"
+  componentId="aabbccdd-1234-5678-abcd-ef0123456789"
+  version="1"
+  name="Sample_HTTP_To_FlatFile_Integration"
+  type="process"
+  subType="General">
+
+  <bns:object>
+    <bns:process allowSimultaneous="false"
+                 autoRestart="false"
+                 enableUserLog="true"
+                 forceRestartConnector="false"
+                 processLogOnErrorOnly="false"
+                 purgeDataImmediately="false"
+                 updateRunDates="true"
+                 workload="general">
+
+      <!-- ═══════════════════════════════════════════════════
+           SHAPES (steps) in the process
+           ═══════════════════════════════════════════════════ -->
+      <bns:shapes>
+
+        <!-- 1. START  -->
+        <bns:shape image="start"
+                   name="Start"
+                   shapetype="start"
+                   userlabel="Start"
+                   x="64" y="192">
+          <bns:configuration>
+            <bns:StartShape actionType="No Data"/>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 2. HTTP CLIENT CONNECTOR  -->
+        <bns:shape image="connector"
+                   name="Get_Orders_HTTP"
+                   shapetype="connector"
+                   userlabel="GET Orders from REST API"
+                   x="192" y="192">
+          <bns:configuration>
+            <bns:ConnectorShape actionType="Get"
+                                connectorType="HTTP">
+              <!-- Reference to a saved HTTP Connection component -->
+              <bns:connectorComponentID>
+                11112222-aaaa-bbbb-cccc-333344445555
+              </bns:connectorComponentID>
+              <bns:parameters>
+                <!-- Static URL override; can also be set on the Connection -->
+                <bns:parameter name="url"
+                               value="https://api.example.com/orders"/>
+                <bns:parameter name="httpMethod" value="GET"/>
+                <bns:parameter name="contentType"
+                               value="application/json"/>
+              </bns:parameters>
+            </bns:ConnectorShape>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 3. MAP  (JSON → Flat File / CSV) -->
+        <bns:shape image="map"
+                   name="Map_Orders_To_CSV"
+                   shapetype="map"
+                   userlabel="Map JSON to CSV"
+                   x="384" y="192">
+          <bns:configuration>
+            <bns:MapShape>
+              <!-- Reference to the saved Map component -->
+              <bns:mapID>ffffeeed-9988-7766-5544-332211001122</bns:mapID>
+            </bns:MapShape>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 4. DECISION  (route by order status) -->
+        <bns:shape image="decision"
+                   name="Check_Order_Status"
+                   shapetype="decision"
+                   userlabel="Order Status = COMPLETE?"
+                   x="576" y="192">
+          <bns:configuration>
+            <bns:DecisionShape firstExpression="order_status"
+                               operator="EQUALS"
+                               secondExpression="COMPLETE"/>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 5a. DISK CONNECTOR – WRITE (True branch) -->
+        <bns:shape image="connector"
+                   name="Write_Complete_Orders"
+                   shapetype="connector"
+                   userlabel="Write Complete Orders to Disk"
+                   x="768" y="128">
+          <bns:configuration>
+            <bns:ConnectorShape actionType="Send"
+                                connectorType="disk">
+              <bns:connectorComponentID>
+                aaaabbbb-1234-1234-1234-ccccddddeeee
+              </bns:connectorComponentID>
+              <bns:parameters>
+                <bns:parameter name="path"
+                               value="/output/complete_orders/"/>
+                <bns:parameter name="filename"
+                               value="complete_orders_{date}.csv"/>
+              </bns:parameters>
+            </bns:ConnectorShape>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 5b. DISK CONNECTOR – WRITE (False branch) -->
+        <bns:shape image="connector"
+                   name="Write_Pending_Orders"
+                   shapetype="connector"
+                   userlabel="Write Pending Orders to Disk"
+                   x="768" y="256">
+          <bns:configuration>
+            <bns:ConnectorShape actionType="Send"
+                                connectorType="disk">
+              <bns:connectorComponentID>
+                aaaabbbb-1234-1234-1234-ccccddddeeee
+              </bns:connectorComponentID>
+              <bns:parameters>
+                <bns:parameter name="path"
+                               value="/output/pending_orders/"/>
+                <bns:parameter name="filename"
+                               value="pending_orders_{date}.csv"/>
+              </bns:parameters>
+            </bns:ConnectorShape>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 6. NOTIFY  (on error) -->
+        <bns:shape image="notify"
+                   name="Notify_On_Error"
+                   shapetype="notify"
+                   userlabel="Send Error Notification"
+                   x="960" y="192">
+          <bns:configuration>
+            <bns:NotifyShape level="ERROR"
+                             message="Order integration failed. Check process logs."/>
+          </bns:configuration>
+        </bns:shape>
+
+        <!-- 7. STOP  -->
+        <bns:shape image="stop"
+                   name="Stop"
+                   shapetype="stop"
+                   userlabel="Stop"
+                   x="1088" y="192">
+          <bns:configuration>
+            <bns:StopShape continueOnError="false"/>
+          </bns:configuration>
+        </bns:shape>
+
+      </bns:shapes>
+
+      <!-- ═══════════════════════════════════════════════════
+           CONNECTIONS (arrows between shapes)
+           ═══════════════════════════════════════════════════ -->
+      <bns:connections>
+        <bns:connection from="Start"               to="Get_Orders_HTTP"/>
+        <bns:connection from="Get_Orders_HTTP"     to="Map_Orders_To_CSV"/>
+        <bns:connection from="Map_Orders_To_CSV"   to="Check_Order_Status"/>
+        <!-- Decision true branch -->
+        <bns:connection from="Check_Order_Status"
+                        to="Write_Complete_Orders"
+                        label="true"/>
+        <!-- Decision false branch -->
+        <bns:connection from="Check_Order_Status"
+                        to="Write_Pending_Orders"
+                        label="false"/>
+        <bns:connection from="Write_Complete_Orders" to="Stop"/>
+        <bns:connection from="Write_Pending_Orders"  to="Stop"/>
+        <!-- Error paths route to Notify -->
+        <bns:connection from="Get_Orders_HTTP"     to="Notify_On_Error"
+                        type="error"/>
+        <bns:connection from="Map_Orders_To_CSV"   to="Notify_On_Error"
+                        type="error"/>
+        <bns:connection from="Notify_On_Error"     to="Stop"/>
+      </bns:connections>
+
+    </bns:process>
+  </bns:object>
+
+</bns:Component>
