@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dell Boomi Process: JsonToXml_OrderIntake
+  Use case: Receive customer purchase orders as JSON via a Web Services Listener,
+  transform to the canonical cXML OrderRequest format, and dispatch to the
+  on-premise ERP (SAP) over HTTPS.
+
+  Pattern: Real-time API -> Map -> HTTP Connector. Common in B2B order intake
+  where modern storefronts speak JSON but legacy ERPs require XML.
+-->
+<process name="JsonToXml_OrderIntake" platform="Dell Boomi" version="1.0">
+
+  <shape id="start_listener"
+         name="Receive JSON Order (Web Services Listener)"
+         type="start"
+         shapeType="start.webservices"
+         operation="POST /orders"
+         contentType="application/json"
+         expectedProfile="JSON_PurchaseOrder_v1"/>
+
+  <shape id="set_correlation_id"
+         name="Set Correlation Properties"
+         type="setProperties"
+         property.correlationId="$dynamic.correlation.id"
+         property.receivedTs="$NOW()"/>
+
+  <shape id="data_process_parse_json"
+         name="Parse Inbound JSON"
+         type="dataProcess"
+         action="JSONToProfile"
+         inboundProfile="JSON_PurchaseOrder_v1"/>
+
+  <shape id="map_json_to_cxml"
+         name="Map JSON Order -> cXML OrderRequest"
+         type="map"
+         sourceProfile="JSON_PurchaseOrder_v1"
+         targetProfile="XML_cXML_OrderRequest_v1.2.045"
+         mapping="orders.id=>OrderRequest/OrderRequestHeader/@orderID,
+                  orders.customer.email=>OrderRequest/OrderRequestHeader/Contact[@role='billTo']/Email,
+                  orders.totals.grandTotal=>OrderRequest/OrderRequestHeader/Total/Money,
+                  orders.lineItems[*]=>OrderRequest/ItemOut"/>
+
+  <shape id="connector_erp_http"
+         name="POST cXML to SAP ERP"
+         type="connectorAction"
+         shapeType="connector.http"
+         action="SEND"
+         url="https://erp.internal.acmecorp.com/cxml/orders"
+         method="POST"
+         contentType="application/xml"
+         authType="BASIC"
+         retryOnFail="true"
+         timeoutSec="30"/>
+
+  <shape id="decision_http_status"
+         name="HTTP 2xx?"
+         type="decision"
+         expression="document.dynamic.userdefined.statusCode startsWith '2'"/>
+
+  <shape id="notify_success"
+         name="Notify Success"
+         type="notify"
+         level="INFO"
+         message="Order accepted by ERP for correlationId=$correlation.id"/>
+
+  <shape id="notify_failure"
+         name="Route to DLQ + Alert"
+         type="notify"
+         level="ERROR"
+         message="ERP rejected order $correlation.id status=$statusCode"
+         emailRecipients="integration-ops@acmecorp.com"/>
+
+  <shape id="return_documents"
+         name="Return ACK to Caller"
+         type="returnDocuments"
+         responseProfile="JSON_OrderAck_v1"/>
+
+  <connection source="start_listener"          target="set_correlation_id"/>
+  <connection source="set_correlation_id"      target="data_process_parse_json"/>
+  <connection source="data_process_parse_json" target="map_json_to_cxml"/>
+  <connection source="map_json_to_cxml"        target="connector_erp_http"/>
+  <connection source="connector_erp_http"      target="decision_http_status"/>
+  <connection source="decision_http_status"    target="notify_success"  label="true"/>
+  <connection source="decision_http_status"    target="notify_failure"  label="false"/>
+  <connection source="notify_success"          target="return_documents"/>
+  <connection source="notify_failure"          target="return_documents"/>
+
+</process>

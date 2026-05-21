@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dell Boomi Process: OAuthApi_CustomerSync
+  Use case: Hourly sync of customers from Salesforce-like SaaS CRM into the
+  internal data warehouse. Acquires an OAuth2 bearer token via the
+  client_credentials grant, calls the protected /v1/customers endpoint with
+  pagination, transforms the JSON payload, and upserts into PostgreSQL.
+
+  Pattern: OAuth token -> Authenticated REST GET (paged) -> Map -> DB upsert.
+  Classic SaaS-to-warehouse integration where the API requires a short-lived
+  bearer token refreshed on each run.
+-->
+<process name="OAuthApi_CustomerSync" platform="Dell Boomi" version="1.0">
+
+  <shape id="start_scheduler"
+         name="Hourly Schedule"
+         type="start"
+         shapeType="start.scheduler"
+         cron="0 0 * * * ?"/>
+
+  <shape id="set_oauth_request"
+         name="Build Token Request Body"
+         type="setProperties"
+         property.grantType="client_credentials"
+         property.clientId="$ENV.CRM_CLIENT_ID"
+         property.clientSecret="$VAULT.CRM_CLIENT_SECRET"
+         property.scope="customers.read"/>
+
+  <shape id="connector_oauth_token"
+         name="POST /oauth2/token (client_credentials)"
+         type="connectorAction"
+         shapeType="connector.http"
+         action="SEND"
+         url="https://login.crm.example.com/oauth2/token"
+         method="POST"
+         contentType="application/x-www-form-urlencoded"
+         authType="NONE"
+         retryOnFail="true"
+         retryAttempts="3"
+         expectedStatus="200"/>
+
+  <shape id="data_process_extract_token"
+         name="Extract access_token from Response"
+         type="dataProcess"
+         action="JSONToProfile"
+         inboundProfile="JSON_OAuthTokenResponse"
+         extract="access_token=>dynamic.bearerToken,
+                  expires_in=>dynamic.tokenTtl"/>
+
+  <shape id="decision_token_ok"
+         name="Token Acquired?"
+         type="decision"
+         expression="dynamic.bearerToken is not null and dynamic.bearerToken != ''"/>
+
+  <shape id="notify_auth_failure"
+         name="Alert: OAuth Token Failed"
+         type="notify"
+         level="ERROR"
+         message="Failed to acquire CRM OAuth token; customer sync aborted."
+         emailRecipients="integration-ops@acmecorp.com"/>
+
+  <shape id="connector_get_customers"
+         name="GET /v1/customers?updatedSince=$lastRun (Bearer)"
+         type="connectorAction"
+         shapeType="connector.http"
+         action="GET"
+         url="https://api.crm.example.com/v1/customers"
+         method="GET"
+         header.Authorization="Bearer $dynamic.bearerToken"
+         queryParam.updatedSince="$dynamic.lastRunIso"
+         queryParam.pageSize="200"
+         pagination="cursor"
+         paginationCursorField="meta.nextCursor"
+         retryOnFail="true"
+         expectedStatus="200"/>
+
+  <shape id="data_process_parse_customers"
+         name="Parse Customer Pages to Profile"
+         type="dataProcess"
+         action="JSONToProfile"
+         inboundProfile="JSON_CRMCustomer_v1"
+         flatten="data[*]"/>
+
+  <shape id="map_customer_to_warehouse"
+         name="Map CRM Customer -> Warehouse Row"
+         type="map"
+         sourceProfile="JSON_CRMCustomer_v1"
+         targetProfile="DB_DW_DimCustomer"
+         mapping="id=>customer_id,
+                  attributes.email=>email,
+                  attributes.firstName=>first_name,
+                  attributes.lastName=>last_name,
+                  attributes.tier=>loyalty_tier,
+                  attributes.address.country=>country_iso2,
+                  meta.updatedAt=>updated_at,
+                  functions.now()=>ingested_at"/>
+
+  <shape id="connector_db_upsert"
+         name="Upsert into dw.dim_customer (Postgres)"
+         type="connectorAction"
+         shapeType="connector.database"
+         action="UPSERT"
+         connection="dw-postgres-prod"
+         schema="dw"
+         table="dim_customer"
+         keyColumns="customer_id"
+         batchSize="500"/>
+
+  <shape id="set_last_run"
+         name="Persist Watermark"
+         type="setProperties"
+         property.lastRunIso="$NOW()"
+         persist="processProperty"/>
+
+  <shape id="notify_summary"
+         name="Run Summary"
+         type="notify"
+         level="INFO"
+         message="CRM customer sync complete. Rows upserted: $document.count"/>
+
+  <connection source="start_scheduler"             target="set_oauth_request"/>
+  <connection source="set_oauth_request"           target="connector_oauth_token"/>
+  <connection source="connector_oauth_token"       target="data_process_extract_token"/>
+  <connection source="data_process_extract_token"  target="decision_token_ok"/>
+  <connection source="decision_token_ok"           target="connector_get_customers" label="true"/>
+  <connection source="decision_token_ok"           target="notify_auth_failure"     label="false"/>
+  <connection source="connector_get_customers"     target="data_process_parse_customers"/>
+  <connection source="data_process_parse_customers" target="map_customer_to_warehouse"/>
+  <connection source="map_customer_to_warehouse"   target="connector_db_upsert"/>
+  <connection source="connector_db_upsert"         target="set_last_run"/>
+  <connection source="set_last_run"                target="notify_summary"/>
+
+</process>
