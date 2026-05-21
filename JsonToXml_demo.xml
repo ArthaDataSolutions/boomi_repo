@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi Process : JsonToXml_demo
+  Pattern       : JSON -> XML (fully offline, no network calls)
+  Dependencies  : Python stdlib only (json, xml.etree.ElementTree)
+-->
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="demo-0001-json-to-xml"
+         name="JsonToXml_demo"
+         processName="JsonToXml_demo"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start"
+         name="Start"
+         type="start"
+         shapeType="start.nodata"
+         inputData='{
+  "invoiceId": "INV-2024-0042",
+  "customerName": "Acme Corp",
+  "invoiceTotal": 1250.00,
+  "currency": "USD",
+  "lineItems": [
+    {"sku": "WIDGET-A", "qty": 10, "unitPrice": 50.00},
+    {"sku": "GADGET-B", "qty": 5, "unitPrice": 150.00}
+  ]
+}'/>
+
+  <shape id="parse_json"
+         name="Parse JSON string to dict"
+         type="dataProcess"
+         action="parseJSON"/>
+
+  <shape id="map_to_xml"
+         name="Convert dict to XML"
+         type="map"
+         mappings="invoiceId->Invoice/InvoiceId;customerName->Invoice/Customer;invoiceTotal->Invoice/Total;currency->Invoice/Total/@currency;lineItems[].sku->Invoice/Lines/Line/@sku;lineItems[].qty->Invoice/Lines/Line/@qty;lineItems[].unitPrice->Invoice/Lines/Line/@unitPrice"/>
+
+  <shape id="print_output"
+         name="Print XML to stdout"
+         type="stop"
+         action="print"/>
+
+  <connection source="start"       target="parse_json"/>
+  <connection source="parse_json"  target="map_to_xml"/>
+  <connection source="map_to_xml"  target="print_output"/>
+
+</process>

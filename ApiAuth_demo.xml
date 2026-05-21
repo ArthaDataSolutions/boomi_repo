@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi Process : ApiAuth_demo
+  Pattern       : API Auth client_credentials -> token -> call API -> data
+                  (fully offline, no network calls, all responses are hardcoded)
+  Dependencies  : Python stdlib only (json)
+-->
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="demo-0003-api-auth"
+         name="ApiAuth_demo"
+         processName="ApiAuth_demo"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start"
+         name="Start"
+         type="start"
+         shapeType="start.nodata"/>
+
+  <shape id="build_token_request"
+         name="Build token request body"
+         type="setProperties"
+         clientId="demo_client_001"
+         clientSecret="demo_secret_xyz"
+         grantType="client_credentials"
+         tokenUrl="https://auth.example.com/oauth2/token"/>
+
+  <shape id="call_token_endpoint"
+         name="POST to token endpoint (mocked)"
+         type="connectorAction"
+         shapeType="connector.http"
+         mode="mock"
+         mockResponse='{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZW1vX2NsaWVudF8wMDEiLCJleHAiOjk5OTk5OTk5OTl9.mock_signature",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}'/>
+
+  <shape id="extract_token"
+         name="Extract access_token from response"
+         type="dataProcess"
+         action="parseJSON"
+         extractField="access_token"/>
+
+  <shape id="decision_token_ok"
+         name="Token acquired?"
+         type="decision"
+         expression="access_token is not null and access_token != ''"/>
+
+  <shape id="call_inventory_api"
+         name="GET /v1/inventory with Bearer token (mocked)"
+         type="connectorAction"
+         shapeType="connector.http"
+         mode="mock"
+         mockResponse='{
+  "items": [
+    {"sku": "WIDGET-A", "warehouse": "US-WEST-1", "onHand": 340, "reserved": 12},
+    {"sku": "GADGET-B", "warehouse": "US-EAST-2", "onHand": 0, "reserved": 0},
+    {"sku": "PART-C",   "warehouse": "US-WEST-1", "onHand": 87, "reserved": 5}
+  ],
+  "fetchedAt": "2024-12-19T14:30:00Z",
+  "totalItems": 3
+}'/>
+
+  <shape id="notify_auth_failure"
+         name="Log auth failure"
+         type="notify"
+         level="ERROR"
+         message="Failed to acquire token. Aborting."/>
+
+  <shape id="print_output"
+         name="Print inventory data to stdout"
+         type="stop"
+         action="print"/>
+
+  <connection source="start"                target="build_token_request"/>
+  <connection source="build_token_request"  target="call_token_endpoint"/>
+  <connection source="call_token_endpoint"  target="extract_token"/>
+  <connection source="extract_token"        target="decision_token_ok"/>
+  <connection source="decision_token_ok"    target="call_inventory_api"  label="true"/>
+  <connection source="decision_token_ok"    target="notify_auth_failure" label="false"/>
+  <connection source="call_inventory_api"   target="print_output"/>
+  <connection source="notify_auth_failure"  target="print_output"/>
+
+</process>

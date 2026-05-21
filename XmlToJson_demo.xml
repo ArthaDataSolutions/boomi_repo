@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi Process : XmlToJson_demo
+  Pattern       : XML -> JSON (fully offline, no network calls)
+  Dependencies  : Python stdlib only (json, xml.etree.ElementTree)
+-->
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="demo-0002-xml-to-json"
+         name="XmlToJson_demo"
+         processName="XmlToJson_demo"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start"
+         name="Start"
+         type="start"
+         shapeType="start.nodata"
+         inputData='&lt;ShipmentNotifications&gt;
+  &lt;Shipment&gt;
+    &lt;ShipmentId&gt;SHP-88901&lt;/ShipmentId&gt;
+    &lt;OrderId&gt;ORD-2024-0042&lt;/OrderId&gt;
+    &lt;CarrierCode&gt;FEDEX&lt;/CarrierCode&gt;
+    &lt;TrackingNumber&gt;7489203847561&lt;/TrackingNumber&gt;
+    &lt;Status&gt;IN_TRANSIT&lt;/Status&gt;
+    &lt;EstimatedDelivery&gt;2024-12-20&lt;/EstimatedDelivery&gt;
+  &lt;/Shipment&gt;
+  &lt;Shipment&gt;
+    &lt;ShipmentId&gt;SHP-88902&lt;/ShipmentId&gt;
+    &lt;OrderId&gt;ORD-2024-0043&lt;/OrderId&gt;
+    &lt;CarrierCode&gt;UPS&lt;/CarrierCode&gt;
+    &lt;TrackingNumber&gt;1Z999AA10123456784&lt;/TrackingNumber&gt;
+    &lt;Status&gt;DELIVERED&lt;/Status&gt;
+    &lt;EstimatedDelivery&gt;2024-12-18&lt;/EstimatedDelivery&gt;
+  &lt;/Shipment&gt;
+&lt;/ShipmentNotifications&gt;'/>
+
+  <shape id="parse_xml"
+         name="Parse XML string to element tree"
+         type="dataProcess"
+         action="parseXML"
+         splitElement="Shipment"/>
+
+  <shape id="map_to_json"
+         name="Convert each Shipment element to JSON object"
+         type="map"
+         mappings="ShipmentId->shipmentId;OrderId->orderId;CarrierCode->carrierCode;TrackingNumber->trackingNumber;Status->status;EstimatedDelivery->estimatedDelivery"/>
+
+  <shape id="print_output"
+         name="Print JSON array to stdout"
+         type="stop"
+         action="print"/>
+
+  <connection source="start"        target="parse_xml"/>
+  <connection source="parse_xml"    target="map_to_json"/>
+  <connection source="map_to_json"  target="print_output"/>
+
+</process>
