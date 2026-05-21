@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi Process : ApiAuth_InventoryFetch
+  Pattern       : API Auth (client_id + client_secret -> token -> call API -> data)
+  Env Variables : None
+
+  Ideal Token Response (POST https://auth.warehouse-api.example.com/oauth2/token):
+  HTTP 200 OK
+  {
+    "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3aF9saXZlX2NsaWVudF8wMDEiLCJzY29wZSI6InJlYWQ6aW52ZW50b3J5IiwiZXhwIjoxNzM0NjIwNjAwfQ",
+    "token_type": "Bearer",
+    "expires_in": 3600
+  }
+
+  Ideal Inventory Response (GET https://warehouse-api.example.com/v1/inventory):
+  HTTP 200 OK
+  {
+    "items": [
+      { "sku": "WIDGET-A", "warehouse": "US-WEST-1", "onHand": 340, "reserved": 12 },
+      { "sku": "GADGET-B", "warehouse": "US-EAST-2", "onHand": 0, "reserved": 0 },
+      { "sku": "PART-C",   "warehouse": "US-WEST-1", "onHand": 87, "reserved": 5 }
+    ],
+    "fetchedAt": "2024-12-19T14:30:00Z",
+    "totalItems": 3
+  }
+-->
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="66666666-ffff-4000-8000-000000000001"
+         name="ApiAuth_InventoryFetch"
+         processName="ApiAuth_InventoryFetch"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start_scheduler"
+         name="Every 30 Minutes"
+         type="start"
+         shapeType="start.scheduler"
+         cron="0 0/30 * * * ?"/>
+
+  <shape id="set_auth_properties"
+         name="Build Token Request"
+         type="setProperties"
+         tokenUrl="https://auth.warehouse-api.example.com/oauth2/token"
+         clientId="wh_live_client_001"
+         clientSecret="supersecret123"
+         grantType="client_credentials"
+         sampleRequestBody="grant_type=client_credentials&amp;client_id=wh_live_client_001&amp;client_secret=supersecret123"/>
+
+  <shape id="connector_get_token"
+         name="POST /oauth2/token"
+         type="connectorAction"
+         shapeType="connector.http"
+         url="https://auth.warehouse-api.example.com/oauth2/token"
+         httpMethod="POST"
+         contentType="application/x-www-form-urlencoded"/>
+
+  <shape id="data_process_parse_token"
+         name="Extract access_token"
+         type="dataProcess"
+         action="JSONToProfile"
+         extractField="access_token"/>
+
+  <shape id="decision_token_ok"
+         name="Token Acquired?"
+         type="decision"
+         expression="access_token is not null and access_token != ''"/>
+
+  <shape id="connector_get_inventory"
+         name="GET /v1/inventory (Bearer)"
+         type="connectorAction"
+         shapeType="connector.http"
+         url="https://warehouse-api.example.com/v1/inventory"
+         httpMethod="GET"
+         contentType="application/json"
+         authHeader="Bearer $access_token"/>
+
+  <shape id="notify_auth_failure"
+         name="Alert: Auth Failed"
+         type="notify"
+         level="ERROR"
+         message="Failed to acquire bearer token. Inventory fetch aborted."/>
+
+  <shape id="data_process_parse_inventory"
+         name="Parse Inventory JSON"
+         type="dataProcess"
+         action="JSONToProfile"
+         extractField="items"/>
+
+  <shape id="connector_disk_write"
+         name="Write Inventory to Disk"
+         type="connectorAction"
+         shapeType="connector.disk"
+         path="/output/inventory/"
+         filename="inventory_snapshot_{timestamp}.json"/>
+
+  <shape id="notify_success"
+         name="Inventory Fetch Complete"
+         type="notify"
+         level="INFO"
+         message="Inventory snapshot written. Items fetched: $document.count"/>
+
+  <shape id="stop" name="End" type="stop"/>
+
+  <connection source="start_scheduler"              target="set_auth_properties"/>
+  <connection source="set_auth_properties"          target="connector_get_token"/>
+  <connection source="connector_get_token"          target="data_process_parse_token"/>
+  <connection source="data_process_parse_token"     target="decision_token_ok"/>
+  <connection source="decision_token_ok"            target="connector_get_inventory" label="true"/>
+  <connection source="decision_token_ok"            target="notify_auth_failure"     label="false"/>
+  <connection source="connector_get_inventory"      target="data_process_parse_inventory"/>
+  <connection source="data_process_parse_inventory" target="connector_disk_write"/>
+  <connection source="connector_disk_write"         target="notify_success"/>
+  <connection source="notify_success"               target="stop"/>
+  <connection source="notify_auth_failure"          target="stop"/>
+
+</process>

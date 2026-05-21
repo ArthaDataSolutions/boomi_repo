@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi Process : JsonToXml_InvoiceTransform
+  Pattern       : JSON -> XML
+  Env Variables : None
+
+  Ideal Billing API Response (POST https://billing.example.com/api/invoices):
+  HTTP 201 Created
+  {
+    "status": "accepted",
+    "invoiceId": "INV-2024-0042",
+    "billingRef": "BIL-99201",
+    "message": "Invoice queued for processing"
+  }
+-->
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="44444444-dddd-4000-8000-000000000001"
+         name="JsonToXml_InvoiceTransform"
+         processName="JsonToXml_InvoiceTransform"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start_http_listener"
+         name="Receive JSON Invoice"
+         type="start"
+         shapeType="start.webservices"
+         sampleInput='{
+           "invoiceId": "INV-2024-0042",
+           "customerName": "Acme Corp",
+           "invoiceTotal": 1250.00,
+           "currency": "USD",
+           "lineItems": [
+             { "sku": "WIDGET-A", "qty": 10, "unitPrice": 50.00 },
+             { "sku": "GADGET-B", "qty": 5, "unitPrice": 150.00 }
+           ]
+         }'/>
+
+  <shape id="data_process_parse_json"
+         name="Parse JSON Invoice"
+         type="dataProcess"
+         action="JSONToProfile"/>
+
+  <shape id="map_json_to_xml"
+         name="Map JSON Invoice -> XML Invoice"
+         type="map"
+         mappings="invoiceId->InvoiceId;customerName->Customer;invoiceTotal->Total;currency->Total/@currency;lineItems[].sku->Line/@sku;lineItems[].qty->Line/@qty;lineItems[].unitPrice->Line/@unitPrice"
+         sampleOutput='&lt;Invoice&gt;
+           &lt;InvoiceId&gt;INV-2024-0042&lt;/InvoiceId&gt;
+           &lt;Customer&gt;Acme Corp&lt;/Customer&gt;
+           &lt;Total currency="USD"&gt;1250.00&lt;/Total&gt;
+           &lt;Lines&gt;
+             &lt;Line sku="WIDGET-A" qty="10" unitPrice="50.00"/&gt;
+             &lt;Line sku="GADGET-B" qty="5" unitPrice="150.00"/&gt;
+           &lt;/Lines&gt;
+         &lt;/Invoice&gt;'/>
+
+  <shape id="decision_validate"
+         name="Invoice Total > 0?"
+         type="decision"
+         expression="invoiceTotal > 0"/>
+
+  <shape id="connector_post_billing"
+         name="POST XML Invoice to Billing API"
+         type="connectorAction"
+         shapeType="connector.http"
+         url="https://billing.example.com/api/invoices"
+         httpMethod="POST"
+         contentType="application/xml"/>
+
+  <shape id="notify_invalid"
+         name="Reject Invalid Invoice"
+         type="notify"
+         level="WARNING"
+         message="Invoice rejected: total is zero or negative for invoiceId=$invoiceId"/>
+
+  <shape id="notify_success"
+         name="Invoice Accepted"
+         type="notify"
+         level="INFO"
+         message="XML invoice $invoiceId posted successfully."/>
+
+  <shape id="stop" name="End" type="stop"/>
+
+  <connection source="start_http_listener"    target="data_process_parse_json"/>
+  <connection source="data_process_parse_json" target="map_json_to_xml"/>
+  <connection source="map_json_to_xml"         target="decision_validate"/>
+  <connection source="decision_validate"       target="connector_post_billing" label="true"/>
+  <connection source="decision_validate"       target="notify_invalid"         label="false"/>
+  <connection source="connector_post_billing"  target="notify_success"/>
+  <connection source="notify_success"          target="stop"/>
+  <connection source="notify_invalid"          target="stop"/>
+
+</process>
