@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="33333333-cccc-4000-8000-000000000001"
+         name="OAuthApi_CustomerSync"
+         processName="OAuthApi_CustomerSync"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start_scheduler"
+         name="Hourly Schedule"
+         type="start"
+         shapeType="start.scheduler"
+         cron="0 0 * * * ?"/>
+
+  <shape id="set_oauth_request"
+         name="Build Token Request Body"
+         type="setProperties"
+         componentRef="33333333-cccc-4000-8000-000000000060"/>
+
+  <shape id="connector_oauth_token"
+         name="POST /oauth2/token (client_credentials)"
+         type="connectorAction"
+         shapeType="connector.http"
+         connectionRef="33333333-cccc-4000-8000-000000000010"
+         operationRef="33333333-cccc-4000-8000-000000000011"/>
+
+  <shape id="data_process_extract_token"
+         name="Extract access_token from Response"
+         type="dataProcess"
+         action="JSONToProfile"
+         profileRef="33333333-cccc-4000-8000-000000000020"/>
+
+  <shape id="decision_token_ok"
+         name="Token Acquired?"
+         type="decision"
+         expression="dynamic.bearerToken is not null and dynamic.bearerToken != ''"/>
+
+  <shape id="notify_auth_failure"
+         name="Alert: OAuth Token Failed"
+         type="notify"
+         level="ERROR"
+         message="Failed to acquire CRM OAuth token; customer sync aborted."
+         emailRecipients="integration-ops@acmecorp.com"/>
+
+  <shape id="connector_get_customers"
+         name="GET /v1/customers?updatedSince=$lastRun (Bearer)"
+         type="connectorAction"
+         shapeType="connector.http"
+         connectionRef="33333333-cccc-4000-8000-000000000012"
+         operationRef="33333333-cccc-4000-8000-000000000013"/>
+
+  <shape id="data_process_parse_customers"
+         name="Parse Customer Pages to Profile"
+         type="dataProcess"
+         action="JSONToProfile"
+         profileRef="33333333-cccc-4000-8000-000000000021"/>
+
+  <shape id="map_customer_to_warehouse"
+         name="Map CRM Customer -> Warehouse Row"
+         type="map"
+         componentRef="33333333-cccc-4000-8000-000000000030"/>
+
+  <shape id="connector_db_upsert"
+         name="Upsert into dw.dim_customer (Postgres)"
+         type="connectorAction"
+         shapeType="connector.database"
+         connectionRef="33333333-cccc-4000-8000-000000000014"
+         operationRef="33333333-cccc-4000-8000-000000000015"/>
+
+  <shape id="set_last_run"
+         name="Persist Watermark"
+         type="setProperties"
+         componentRef="33333333-cccc-4000-8000-000000000061"/>
+
+  <shape id="notify_summary"
+         name="Run Summary"
+         type="notify"
+         level="INFO"
+         message="CRM customer sync complete. Rows upserted: $document.count"/>
+
+  <connection source="start_scheduler"              target="set_oauth_request"/>
+  <connection source="set_oauth_request"            target="connector_oauth_token"/>
+  <connection source="connector_oauth_token"        target="data_process_extract_token"/>
+  <connection source="data_process_extract_token"   target="decision_token_ok"/>
+  <connection source="decision_token_ok"            target="connector_get_customers" label="true"/>
+  <connection source="decision_token_ok"            target="notify_auth_failure"     label="false"/>
+  <connection source="connector_get_customers"      target="data_process_parse_customers"/>
+  <connection source="data_process_parse_customers" target="map_customer_to_warehouse"/>
+  <connection source="map_customer_to_warehouse"    target="connector_db_upsert"/>
+  <connection source="connector_db_upsert"          target="set_last_run"/>
+  <connection source="set_last_run"                 target="notify_summary"/>
+
+</process>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000060"
+           name="correlation"
+           type="processproperty">
+  <properties>
+    <property name="correlationId" type="string" defaultValue=""/>
+    <property name="receivedTs"    type="datetime" defaultValue=""/>
+    <property name="opsEmail"      type="string" defaultValue="integration-ops@acmecorp.com"/>
+  </properties>
+</component>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000011"
+           name="POST /cxml/orders"
+           type="operation"
+           connectorType="http"
+           connectionRef="11111111-aaaa-4000-8000-000000000010">
+  <operation action="SEND">
+    <field id="method"             defaultValue="POST"/>
+    <field id="resourcePath"       defaultValue="/cxml/orders"/>
+    <field id="requestContentType" defaultValue="application/xml"/>
+    <field id="requestProfile"     defaultValue="11111111-aaaa-4000-8000-000000000021"/>
+    <field id="responseProfile"    defaultValue="11111111-aaaa-4000-8000-000000000022"/>
+    <field id="returnHttpResponseCode" defaultValue="true"/>
+    <field id="retryOnFail"        defaultValue="true"/>
+    <field id="retryAttempts"      defaultValue="3"/>
+  </operation>
+</component>

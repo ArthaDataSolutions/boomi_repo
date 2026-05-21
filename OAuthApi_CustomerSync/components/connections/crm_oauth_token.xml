@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000010"
+           name="CRM OAuth Token Endpoint"
+           type="connection"
+           connectorType="http">
+  <object>
+    <field id="url"                type="string"   defaultValue="https://login.crm.example.com"/>
+    <field id="authenticationType" type="enum"     defaultValue="NONE"/>
+    <field id="oauthClientId"      type="string"   defaultValue=""/>
+    <field id="oauthClientSecret"  type="password" defaultValue=""/>
+    <field id="oauthScope"         type="string"   defaultValue="customers.read"/>
+    <field id="contentType"        type="string"   defaultValue="application/x-www-form-urlencoded"/>
+  </object>
+</component>

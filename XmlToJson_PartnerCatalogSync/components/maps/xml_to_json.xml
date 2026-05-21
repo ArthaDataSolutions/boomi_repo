@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000030"
+           name="Map XML Product -> JSON CatalogItem"
+           type="map"
+           sourceProfileRef="22222222-bbbb-4000-8000-000000000020"
+           targetProfileRef="22222222-bbbb-4000-8000-000000000021">
+  <map>
+    <mapping source="Product/@sku"                              target="sku"/>
+    <mapping source="Product/Name"                              target="name"/>
+    <mapping source="Product/Description"                       target="description"/>
+    <mapping source="Product/Pricing/Price"                     target="price.amount"/>
+    <mapping source="Product/Pricing/Price/@currency"           target="price.currency"/>
+    <mapping source="Product/Stock/OnHand"                      target="inventory.onHand"/>
+    <mapping source="Product/Stock/Warehouse"                   target="inventory.warehouse"/>
+    <mapping repeating="true"
+             source="Product/Categories/Category[*]"            target="categories"/>
+    <function id="ingestedAt" type="DateNow"
+              target="ingestedAt"
+              format="yyyy-MM-dd'T'HH:mm:ssXXX"/>
+    <function id="default_currency" type="DefaultIfNull"
+              target="price.currency"
+              defaultValue="USD"/>
+  </map>
+</component>

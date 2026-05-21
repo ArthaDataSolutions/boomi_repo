@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000012"
+           name="CRM API (Bearer)"
+           type="connection"
+           connectorType="http">
+  <object>
+    <field id="url"                type="string"   defaultValue="https://api.crm.example.com"/>
+    <field id="authenticationType" type="enum"     defaultValue="DYNAMIC_HEADER"/>
+    <field id="dynamicAuthHeader"  type="string"   defaultValue="Authorization"/>
+    <field id="contentType"        type="string"   defaultValue="application/json"/>
+    <field id="connectTimeout"     type="integer"  defaultValue="15000"/>
+    <field id="readTimeout"        type="integer"  defaultValue="60000"/>
+  </object>
+</component>

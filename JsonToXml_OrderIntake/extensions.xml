@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Boomi deployment extensions. Atom-level overrides for per-environment values.
+  Placeholders below map to entries in the root .env.example.
+-->
+<extensions xmlns="http://api.platform.boomi.com/" processName="JsonToXml_OrderIntake">
+
+  <connections>
+    <connection id="11111111-aaaa-4000-8000-000000000010" name="erp_http">
+      <field id="url"      usesEncryption="false">${ERP_BASE_URL}/cxml/orders</field>
+      <field id="username" usesEncryption="false">${ERP_BASIC_USER}</field>
+      <field id="password" usesEncryption="true">${ERP_BASIC_PASSWORD}</field>
+    </connection>
+    <connection id="11111111-aaaa-4000-8000-000000000050" name="ws_listener">
+      <field id="basePath" usesEncryption="false">${WS_LISTENER_BASE_PATH}</field>
+    </connection>
+  </connections>
+
+  <processProperties>
+    <processProperty id="11111111-aaaa-4000-8000-000000000060" name="correlation">
+      <property name="opsEmail">${OPS_ALERT_EMAIL}</property>
+    </processProperty>
+  </processProperties>
+
+</extensions>

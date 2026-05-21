@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns="http://api.platform.boomi.com/" processName="JsonToXml_OrderIntake" exportedAt="2026-05-20T00:00:00Z">
+  <component id="11111111-aaaa-4000-8000-000000000001" type="process"          path="process.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000010" type="connection"       path="components/connections/erp_http.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000011" type="operation"        path="components/operations/erp_post_orders.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000020" type="profile.json"     path="components/profiles/json_purchase_order.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000021" type="profile.xml"      path="components/profiles/xml_cxml_orderrequest.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000022" type="profile.json"     path="components/profiles/json_order_ack.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000030" type="map"              path="components/maps/json_to_cxml.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000050" type="connection"       path="components/connections/ws_listener.xml"/>
+  <component id="11111111-aaaa-4000-8000-000000000060" type="processproperty"  path="components/processproperties/correlation.xml"/>
+</manifest>

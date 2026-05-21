@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns="http://api.platform.boomi.com/" processName="OAuthApi_CustomerSync" exportedAt="2026-05-20T00:00:00Z">
+  <component id="33333333-cccc-4000-8000-000000000001" type="process"         path="process.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000010" type="connection"      path="components/connections/crm_oauth_token.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000011" type="operation"       path="components/operations/oauth_post_token.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000012" type="connection"      path="components/connections/crm_api.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000013" type="operation"       path="components/operations/crm_get_customers.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000014" type="connection"      path="components/connections/dw_postgres.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000015" type="operation"       path="components/operations/postgres_upsert_customer.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000020" type="profile.json"    path="components/profiles/json_oauth_token_response.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000021" type="profile.json"    path="components/profiles/json_crm_customer.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000022" type="profile.database" path="components/profiles/db_dw_dim_customer.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000030" type="map"             path="components/maps/customer_to_warehouse.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000060" type="processproperty" path="components/processproperties/oauth_request.xml"/>
+  <component id="33333333-cccc-4000-8000-000000000061" type="processproperty" path="components/processproperties/last_run.xml"/>
+</manifest>

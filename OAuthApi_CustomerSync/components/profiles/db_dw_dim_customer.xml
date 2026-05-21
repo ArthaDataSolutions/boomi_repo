@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000022"
+           name="DB_DW_DimCustomer"
+           type="profile.database">
+  <profile schema="dw" table="dim_customer">
+    <column name="customer_id"   type="varchar(64)" primaryKey="true" nullable="false"/>
+    <column name="email"         type="varchar(320)" nullable="true"/>
+    <column name="first_name"    type="varchar(128)" nullable="true"/>
+    <column name="last_name"     type="varchar(128)" nullable="true"/>
+    <column name="loyalty_tier"  type="varchar(16)"  nullable="true"/>
+    <column name="country_iso2"  type="char(2)"      nullable="true"/>
+    <column name="updated_at"    type="timestamptz"  nullable="true"/>
+    <column name="ingested_at"   type="timestamptz"  nullable="false"/>
+  </profile>
+</component>

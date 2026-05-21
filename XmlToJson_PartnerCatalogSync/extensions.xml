@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extensions xmlns="http://api.platform.boomi.com/" processName="XmlToJson_PartnerCatalogSync">
+
+  <connections>
+    <connection id="22222222-bbbb-4000-8000-000000000010" name="supplier_sftp">
+      <field id="host"       usesEncryption="false">${SFTP_HOST}</field>
+      <field id="port"       usesEncryption="false">${SFTP_PORT}</field>
+      <field id="username"   usesEncryption="false">${SFTP_USER}</field>
+      <field id="privateKey" usesEncryption="true">${SFTP_PRIVATE_KEY}</field>
+      <field id="remoteDir"  usesEncryption="false">${SFTP_REMOTE_DIR}</field>
+    </connection>
+    <connection id="22222222-bbbb-4000-8000-000000000012" name="storefront_http">
+      <field id="url"             usesEncryption="false">${STOREFRONT_BASE_URL}</field>
+      <field id="oauthClientId"   usesEncryption="false">${STOREFRONT_OAUTH_CLIENT_ID}</field>
+      <field id="oauthClientSecret" usesEncryption="true">${STOREFRONT_OAUTH_CLIENT_SECRET}</field>
+      <field id="oauthTokenUrl"   usesEncryption="false">${STOREFRONT_OAUTH_TOKEN_URL}</field>
+    </connection>
+  </connections>
+
+</extensions>

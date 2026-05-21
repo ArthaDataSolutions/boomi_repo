@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000014"
+           name="POST /v2/catalog/archive"
+           type="operation"
+           connectorType="http"
+           connectionRef="22222222-bbbb-4000-8000-000000000012">
+  <operation action="SEND">
+    <field id="method"             defaultValue="POST"/>
+    <field id="resourcePath"       defaultValue="/v2/catalog/archive"/>
+    <field id="requestContentType" defaultValue="application/json"/>
+    <field id="requestProfile"     defaultValue="22222222-bbbb-4000-8000-000000000021"/>
+  </operation>
+</component>

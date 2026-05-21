@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000020"
+           name="XML_SupplierCatalog_v3"
+           type="profile.xml">
+  <profile rootElement="Catalog">
+    <element name="Catalog">
+      <attribute name="supplierId" type="string"/>
+      <attribute name="generatedAt" type="datetime"/>
+      <element name="Product" maxOccurs="unbounded">
+        <attribute name="sku" type="string"/>
+        <element name="Name" type="string"/>
+        <element name="Description" type="string"/>
+        <element name="Pricing">
+          <element name="Price" type="decimal">
+            <attribute name="currency" type="string"/>
+          </element>
+        </element>
+        <element name="Stock">
+          <element name="OnHand" type="integer"/>
+          <element name="Warehouse" type="string"/>
+        </element>
+        <element name="Categories">
+          <element name="Category" type="string" maxOccurs="unbounded"/>
+        </element>
+      </element>
+    </element>
+  </profile>
+</component>

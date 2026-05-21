@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000013"
+           name="GET /v1/customers (paged)"
+           type="operation"
+           connectorType="http"
+           connectionRef="33333333-cccc-4000-8000-000000000012">
+  <operation action="GET">
+    <field id="method"              defaultValue="GET"/>
+    <field id="resourcePath"        defaultValue="/v1/customers"/>
+    <field id="requestHeaders"      defaultValue="Authorization: Bearer ${dynamic.bearerToken}"/>
+    <field id="queryParameters"     defaultValue="updatedSince=${dynamic.lastRunIso}&amp;pageSize=200"/>
+    <field id="responseProfile"     defaultValue="33333333-cccc-4000-8000-000000000021"/>
+    <field id="pagination"          defaultValue="cursor"/>
+    <field id="paginationCursorField" defaultValue="meta.nextCursor"/>
+    <field id="paginationCursorParam" defaultValue="cursor"/>
+    <field id="expectedStatus"      defaultValue="200"/>
+    <field id="retryOnFail"         defaultValue="true"/>
+    <field id="retryAttempts"       defaultValue="5"/>
+    <field id="retryBackoffMs"      defaultValue="1000"/>
+  </operation>
+</component>

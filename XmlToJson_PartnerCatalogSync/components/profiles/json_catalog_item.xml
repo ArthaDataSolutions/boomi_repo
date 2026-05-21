@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000021"
+           name="JSON_CatalogItem_v2"
+           type="profile.json">
+  <profile rootElement="catalogItem">
+    <element name="catalogItem" type="object">
+      <element name="sku"        type="string"   required="true"/>
+      <element name="name"       type="string"/>
+      <element name="description" type="string"/>
+      <element name="price"      type="object">
+        <element name="amount"   type="decimal"/>
+        <element name="currency" type="string"/>
+      </element>
+      <element name="inventory"  type="object">
+        <element name="onHand"   type="integer"/>
+        <element name="warehouse" type="string"/>
+      </element>
+      <element name="categories" type="array">
+        <element name="category" type="string"/>
+      </element>
+      <element name="ingestedAt" type="datetime"/>
+    </element>
+  </profile>
+</component>

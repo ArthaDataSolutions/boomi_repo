@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000014"
+           name="Data Warehouse Postgres"
+           type="connection"
+           connectorType="database">
+  <object>
+    <field id="driver"   type="string"   defaultValue="org.postgresql.Driver"/>
+    <field id="host"     type="string"   defaultValue=""/>
+    <field id="port"     type="integer"  defaultValue="5432"/>
+    <field id="database" type="string"   defaultValue=""/>
+    <field id="username" type="string"   defaultValue=""/>
+    <field id="password" type="password" defaultValue=""/>
+    <field id="sslMode"  type="enum"     defaultValue="REQUIRE"/>
+  </object>
+</component>

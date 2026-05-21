@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extensions xmlns="http://api.platform.boomi.com/" processName="OAuthApi_CustomerSync">
+
+  <connections>
+    <connection id="33333333-cccc-4000-8000-000000000010" name="crm_oauth_token">
+      <field id="url"               usesEncryption="false">${CRM_OAUTH_TOKEN_URL}</field>
+      <field id="oauthClientId"     usesEncryption="false">${CRM_CLIENT_ID}</field>
+      <field id="oauthClientSecret" usesEncryption="true">${CRM_CLIENT_SECRET}</field>
+      <field id="oauthScope"        usesEncryption="false">${CRM_OAUTH_SCOPE}</field>
+    </connection>
+    <connection id="33333333-cccc-4000-8000-000000000012" name="crm_api">
+      <field id="url" usesEncryption="false">${CRM_API_BASE_URL}</field>
+    </connection>
+    <connection id="33333333-cccc-4000-8000-000000000014" name="dw_postgres">
+      <field id="host"     usesEncryption="false">${DW_POSTGRES_HOST}</field>
+      <field id="port"     usesEncryption="false">${DW_POSTGRES_PORT}</field>
+      <field id="database" usesEncryption="false">${DW_POSTGRES_DB}</field>
+      <field id="username" usesEncryption="false">${DW_POSTGRES_USER}</field>
+      <field id="password" usesEncryption="true">${DW_POSTGRES_PASSWORD}</field>
+    </connection>
+  </connections>
+
+  <processProperties>
+    <processProperty id="33333333-cccc-4000-8000-000000000061" name="last_run">
+      <property name="lastRunIso">${CRM_LAST_RUN_DEFAULT_ISO}</property>
+    </processProperty>
+  </processProperties>
+
+</extensions>

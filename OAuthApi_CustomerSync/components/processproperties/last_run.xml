@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000061"
+           name="last_run"
+           type="processproperty">
+  <properties>
+    <property name="lastRunIso" type="datetime" defaultValue="1970-01-01T00:00:00Z" persistent="true"/>
+  </properties>
+</component>

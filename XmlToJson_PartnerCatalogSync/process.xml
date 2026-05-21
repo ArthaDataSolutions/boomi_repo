@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process xmlns="http://api.platform.boomi.com/"
+         componentId="22222222-bbbb-4000-8000-000000000001"
+         name="XmlToJson_PartnerCatalogSync"
+         processName="XmlToJson_PartnerCatalogSync"
+         platform="Dell Boomi"
+         version="1.0">
+
+  <shape id="start_scheduler"
+         name="Nightly Schedule 02:15 UTC"
+         type="start"
+         shapeType="start.scheduler"
+         cron="0 15 2 * * ?"/>
+
+  <shape id="connector_sftp_get"
+         name="Get Catalog XML from Supplier SFTP"
+         type="connectorAction"
+         shapeType="connector.sftp"
+         connectionRef="22222222-bbbb-4000-8000-000000000010"
+         operationRef="22222222-bbbb-4000-8000-000000000011"/>
+
+  <shape id="data_process_split"
+         name="Split per &lt;Product&gt; Element"
+         type="dataProcess"
+         action="Split"
+         profileRef="22222222-bbbb-4000-8000-000000000020"
+         splitElement="/Catalog/Product"/>
+
+  <shape id="data_process_xml_to_profile"
+         name="Parse XML to Profile"
+         type="dataProcess"
+         action="XMLToProfile"
+         profileRef="22222222-bbbb-4000-8000-000000000020"/>
+
+  <shape id="map_xml_to_json"
+         name="Map XML Product -> JSON CatalogItem"
+         type="map"
+         componentRef="22222222-bbbb-4000-8000-000000000030"/>
+
+  <shape id="decision_in_stock"
+         name="In Stock?"
+         type="decision"
+         expression="document.dynamic.userdefined.onHand > 0"/>
+
+  <shape id="connector_ecom_post"
+         name="POST CatalogItem to Storefront API"
+         type="connectorAction"
+         shapeType="connector.http"
+         connectionRef="22222222-bbbb-4000-8000-000000000012"
+         operationRef="22222222-bbbb-4000-8000-000000000013"/>
+
+  <shape id="connector_ecom_archive"
+         name="POST Out-of-Stock to Archive Index"
+         type="connectorAction"
+         shapeType="connector.http"
+         connectionRef="22222222-bbbb-4000-8000-000000000012"
+         operationRef="22222222-bbbb-4000-8000-000000000014"/>
+
+  <shape id="notify_summary"
+         name="Email Run Summary"
+         type="notify"
+         level="INFO"
+         message="Partner catalog sync complete. Items processed: $document.count"
+         emailRecipients="merchandising-ops@acmecorp.com"/>
+
+  <connection source="start_scheduler"             target="connector_sftp_get"/>
+  <connection source="connector_sftp_get"          target="data_process_split"/>
+  <connection source="data_process_split"          target="data_process_xml_to_profile"/>
+  <connection source="data_process_xml_to_profile" target="map_xml_to_json"/>
+  <connection source="map_xml_to_json"             target="decision_in_stock"/>
+  <connection source="decision_in_stock"           target="connector_ecom_post"    label="true"/>
+  <connection source="decision_in_stock"           target="connector_ecom_archive" label="false"/>
+  <connection source="connector_ecom_post"         target="notify_summary"/>
+  <connection source="connector_ecom_archive"      target="notify_summary"/>
+
+</process>

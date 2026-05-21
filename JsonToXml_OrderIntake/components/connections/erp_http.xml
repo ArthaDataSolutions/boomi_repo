@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000010"
+           name="ERP HTTP Connection"
+           type="connection"
+           connectorType="http">
+  <object>
+    <field id="url"             type="string"  defaultValue="https://erp.internal.acmecorp.com"/>
+    <field id="authenticationType" type="enum" defaultValue="BASIC"/>
+    <field id="username"        type="string"  defaultValue=""/>
+    <field id="password"        type="password" defaultValue=""/>
+    <field id="contentType"     type="string"  defaultValue="application/xml"/>
+    <field id="connectTimeout"  type="integer" defaultValue="30000"/>
+    <field id="readTimeout"     type="integer" defaultValue="30000"/>
+    <field id="trustAllCerts"   type="boolean" defaultValue="false"/>
+  </object>
+</component>

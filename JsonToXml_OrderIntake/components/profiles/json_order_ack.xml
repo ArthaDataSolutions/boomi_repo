@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000022"
+           name="JSON_OrderAck_v1"
+           type="profile.json">
+  <profile rootElement="ack">
+    <element name="ack" type="object">
+      <element name="orderId"       type="string"/>
+      <element name="status"        type="string"/>
+      <element name="correlationId" type="string"/>
+      <element name="erpStatusCode" type="integer"/>
+      <element name="message"       type="string"/>
+    </element>
+  </profile>
+</component>

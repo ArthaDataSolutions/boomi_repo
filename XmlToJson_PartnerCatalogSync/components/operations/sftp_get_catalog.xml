@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000011"
+           name="GET catalog_*.xml from SFTP"
+           type="operation"
+           connectorType="sftp"
+           connectionRef="22222222-bbbb-4000-8000-000000000010">
+  <operation action="GET">
+    <field id="remoteDirectory" defaultValue="/outbound/catalog"/>
+    <field id="filePattern"     defaultValue="catalog_*.xml"/>
+    <field id="deleteAfterRead" defaultValue="false"/>
+    <field id="archiveDirectory" defaultValue="/archive"/>
+    <field id="maxFilesPerRun"  defaultValue="50"/>
+  </operation>
+</component>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns="http://api.platform.boomi.com/" processName="XmlToJson_PartnerCatalogSync" exportedAt="2026-05-20T00:00:00Z">
+  <component id="22222222-bbbb-4000-8000-000000000001" type="process"      path="process.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000010" type="connection"   path="components/connections/supplier_sftp.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000011" type="operation"    path="components/operations/sftp_get_catalog.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000012" type="connection"   path="components/connections/storefront_http.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000013" type="operation"    path="components/operations/storefront_post_item.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000014" type="operation"    path="components/operations/storefront_post_archive.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000020" type="profile.xml"  path="components/profiles/xml_supplier_catalog.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000021" type="profile.json" path="components/profiles/json_catalog_item.xml"/>
+  <component id="22222222-bbbb-4000-8000-000000000030" type="map"          path="components/maps/xml_to_json.xml"/>
+</manifest>

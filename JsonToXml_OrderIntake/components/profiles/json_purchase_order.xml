@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000020"
+           name="JSON_PurchaseOrder_v1"
+           type="profile.json">
+  <profile rootElement="orders">
+    <element name="orders" type="object">
+      <element name="id"          type="string"  required="true"/>
+      <element name="placedAt"    type="datetime" required="true"/>
+      <element name="customer"    type="object">
+        <element name="id"        type="string"/>
+        <element name="email"     type="string"/>
+        <element name="name"      type="string"/>
+      </element>
+      <element name="totals"      type="object">
+        <element name="subtotal"  type="decimal"/>
+        <element name="tax"       type="decimal"/>
+        <element name="grandTotal" type="decimal"/>
+      </element>
+      <element name="lineItems"   type="array">
+        <element name="item" type="object">
+          <element name="sku"      type="string"/>
+          <element name="quantity" type="integer"/>
+          <element name="unitPrice" type="decimal"/>
+        </element>
+      </element>
+    </element>
+  </profile>
+</component>

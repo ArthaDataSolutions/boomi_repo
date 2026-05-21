@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000060"
+           name="oauth_request"
+           type="processproperty">
+  <properties>
+    <property name="grantType"    type="string" defaultValue="client_credentials"/>
+    <property name="clientId"     type="string" defaultValue=""/>
+    <property name="clientSecret" type="string" defaultValue="" sensitive="true"/>
+    <property name="scope"        type="string" defaultValue="customers.read"/>
+    <property name="bearerToken"  type="string" defaultValue=""/>
+    <property name="tokenTtl"     type="integer" defaultValue="0"/>
+  </properties>
+</component>

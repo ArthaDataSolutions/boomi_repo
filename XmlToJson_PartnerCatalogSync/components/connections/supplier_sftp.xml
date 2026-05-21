@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000010"
+           name="Supplier SFTP"
+           type="connection"
+           connectorType="sftp">
+  <object>
+    <field id="host"           type="string"   defaultValue=""/>
+    <field id="port"           type="integer"  defaultValue="22"/>
+    <field id="username"       type="string"   defaultValue=""/>
+    <field id="authMethod"     type="enum"     defaultValue="PUBLIC_KEY"/>
+    <field id="privateKey"     type="password" defaultValue=""/>
+    <field id="hostKeyVerification" type="boolean" defaultValue="true"/>
+  </object>
+</component>

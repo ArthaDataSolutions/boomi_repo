@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000021"
+           name="XML_cXML_OrderRequest_v1.2.045"
+           type="profile.xml">
+  <profile rootElement="OrderRequest" namespace="http://cxml.org/schemas/cXML.xsd">
+    <element name="OrderRequest">
+      <element name="OrderRequestHeader">
+        <attribute name="orderID" type="string"/>
+        <attribute name="orderDate" type="datetime"/>
+        <element name="Total">
+          <element name="Money" type="decimal">
+            <attribute name="currency" type="string"/>
+          </element>
+        </element>
+        <element name="Contact">
+          <attribute name="role" type="string"/>
+          <element name="Email" type="string"/>
+        </element>
+      </element>
+      <element name="ItemOut" maxOccurs="unbounded">
+        <attribute name="quantity" type="integer"/>
+        <element name="ItemID">
+          <element name="SupplierPartID" type="string"/>
+        </element>
+        <element name="ItemDetail">
+          <element name="UnitPrice">
+            <element name="Money" type="decimal"/>
+          </element>
+        </element>
+      </element>
+    </element>
+  </profile>
+</component>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000030"
+           name="Map CRM Customer -> Warehouse Row"
+           type="map"
+           sourceProfileRef="33333333-cccc-4000-8000-000000000021"
+           targetProfileRef="33333333-cccc-4000-8000-000000000022">
+  <map>
+    <mapping source="id"                              target="customer_id"/>
+    <mapping source="attributes.email"                target="email"/>
+    <mapping source="attributes.firstName"            target="first_name"/>
+    <mapping source="attributes.lastName"             target="last_name"/>
+    <mapping source="attributes.tier"                 target="loyalty_tier"/>
+    <mapping source="attributes.address.country"      target="country_iso2"/>
+    <mapping source="meta.updatedAt"                  target="updated_at"/>
+    <function id="ingested_at" type="DateNow" target="ingested_at"
+              format="yyyy-MM-dd'T'HH:mm:ssXXX"/>
+    <function id="lower_email" type="LowerCase"
+              source="attributes.email" target="email"/>
+    <function id="default_tier" type="DefaultIfNull"
+              target="loyalty_tier" defaultValue="standard"/>
+  </map>
+</component>

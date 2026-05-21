@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000015"
+           name="UPSERT dw.dim_customer"
+           type="operation"
+           connectorType="database"
+           connectionRef="33333333-cccc-4000-8000-000000000014">
+  <operation action="UPSERT">
+    <field id="schema"      defaultValue="dw"/>
+    <field id="table"       defaultValue="dim_customer"/>
+    <field id="keyColumns"  defaultValue="customer_id"/>
+    <field id="batchSize"   defaultValue="500"/>
+    <field id="commitMode"  defaultValue="batch"/>
+    <field id="requestProfile" defaultValue="33333333-cccc-4000-8000-000000000022"/>
+    <field id="upsertSql"
+           defaultValue="INSERT INTO dw.dim_customer (customer_id, email, first_name, last_name, loyalty_tier, country_iso2, updated_at, ingested_at) VALUES (:customer_id, :email, :first_name, :last_name, :loyalty_tier, :country_iso2, :updated_at, :ingested_at) ON CONFLICT (customer_id) DO UPDATE SET email = EXCLUDED.email, first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name, loyalty_tier = EXCLUDED.loyalty_tier, country_iso2 = EXCLUDED.country_iso2, updated_at = EXCLUDED.updated_at, ingested_at = EXCLUDED.ingested_at"/>
+  </operation>
+</component>

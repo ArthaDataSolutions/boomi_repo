@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000011"
+           name="POST /oauth2/token"
+           type="operation"
+           connectorType="http"
+           connectionRef="33333333-cccc-4000-8000-000000000010">
+  <operation action="SEND">
+    <field id="method"             defaultValue="POST"/>
+    <field id="resourcePath"       defaultValue="/oauth2/token"/>
+    <field id="requestContentType" defaultValue="application/x-www-form-urlencoded"/>
+    <field id="requestBodyTemplate"
+           defaultValue="grant_type=client_credentials&amp;client_id={{clientId}}&amp;client_secret={{clientSecret}}&amp;scope={{scope}}"/>
+    <field id="responseProfile"    defaultValue="33333333-cccc-4000-8000-000000000020"/>
+    <field id="expectedStatus"     defaultValue="200"/>
+    <field id="retryOnFail"        defaultValue="true"/>
+    <field id="retryAttempts"      defaultValue="3"/>
+  </operation>
+</component>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="22222222-bbbb-4000-8000-000000000012"
+           name="Storefront HTTP (OAuth2)"
+           type="connection"
+           connectorType="http">
+  <object>
+    <field id="url"                type="string"   defaultValue="https://api.shop.acmecorp.com"/>
+    <field id="authenticationType" type="enum"     defaultValue="OAUTH2"/>
+    <field id="oauthGrantType"     type="enum"     defaultValue="client_credentials"/>
+    <field id="oauthClientId"      type="string"   defaultValue=""/>
+    <field id="oauthClientSecret"  type="password" defaultValue=""/>
+    <field id="oauthTokenUrl"      type="string"   defaultValue=""/>
+    <field id="oauthScope"         type="string"   defaultValue="catalog.write"/>
+    <field id="contentType"        type="string"   defaultValue="application/json"/>
+  </object>
+</component>

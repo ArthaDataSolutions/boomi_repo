@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000030"
+           name="Map JSON Order -> cXML OrderRequest"
+           type="map"
+           sourceProfileRef="11111111-aaaa-4000-8000-000000000020"
+           targetProfileRef="11111111-aaaa-4000-8000-000000000021">
+  <map>
+    <mapping source="orders.id"                  target="OrderRequest/OrderRequestHeader/@orderID"/>
+    <mapping source="orders.placedAt"            target="OrderRequest/OrderRequestHeader/@orderDate"/>
+    <mapping source="orders.customer.email"      target="OrderRequest/OrderRequestHeader/Contact[@role='billTo']/Email"/>
+    <mapping source="orders.totals.grandTotal"   target="OrderRequest/OrderRequestHeader/Total/Money"/>
+    <mapping constant="USD"                      target="OrderRequest/OrderRequestHeader/Total/Money/@currency"/>
+
+    <mapping repeating="true" source="orders.lineItems[*]" target="OrderRequest/ItemOut">
+      <mapping source="quantity"                 target="@quantity"/>
+      <mapping source="sku"                      target="ItemID/SupplierPartID"/>
+      <mapping source="unitPrice"                target="ItemDetail/UnitPrice/Money"/>
+    </mapping>
+
+    <function id="generate_order_date" type="DateNow"
+              target="OrderRequest/OrderRequestHeader/@orderDate"
+              format="yyyy-MM-dd'T'HH:mm:ssXXX"/>
+  </map>
+</component>

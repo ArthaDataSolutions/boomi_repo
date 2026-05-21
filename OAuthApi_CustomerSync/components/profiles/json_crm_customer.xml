@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000021"
+           name="JSON_CRMCustomer_v1"
+           type="profile.json">
+  <profile rootElement="page">
+    <element name="page" type="object">
+      <element name="data" type="array">
+        <element name="customer" type="object">
+          <element name="id"   type="string"/>
+          <element name="type" type="string"/>
+          <element name="attributes" type="object">
+            <element name="email"     type="string"/>
+            <element name="firstName" type="string"/>
+            <element name="lastName"  type="string"/>
+            <element name="tier"      type="string"/>
+            <element name="address"   type="object">
+              <element name="country" type="string"/>
+              <element name="city"    type="string"/>
+            </element>
+          </element>
+          <element name="meta" type="object">
+            <element name="updatedAt" type="datetime"/>
+          </element>
+        </element>
+      </element>
+      <element name="meta" type="object">
+        <element name="nextCursor" type="string"/>
+        <element name="total"      type="integer"/>
+      </element>
+    </element>
+  </profile>
+</component>

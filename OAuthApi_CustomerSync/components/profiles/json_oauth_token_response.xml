@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="33333333-cccc-4000-8000-000000000020"
+           name="JSON_OAuthTokenResponse"
+           type="profile.json">
+  <profile rootElement="tokenResponse">
+    <element name="tokenResponse" type="object">
+      <element name="access_token" type="string" required="true"/>
+      <element name="token_type"   type="string"/>
+      <element name="expires_in"   type="integer"/>
+      <element name="scope"        type="string"/>
+    </element>
+  </profile>
+</component>

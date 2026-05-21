@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://api.platform.boomi.com/"
+           componentId="11111111-aaaa-4000-8000-000000000050"
+           name="Web Services Listener"
+           type="connection"
+           connectorType="webservices">
+  <object>
+    <field id="basePath"        type="string"  defaultValue="/ws/orders"/>
+    <field id="authenticationType" type="enum" defaultValue="API_KEY"/>
+    <field id="allowedMethods"  type="string"  defaultValue="POST"/>
+  </object>
+</component>
