@@ -41,9 +41,10 @@ JsonToXml_OrderIntake/
 ## Environment overrides
 
 `extensions.xml` in each process references `${VARIABLE}` placeholders
-that map to the entries in [`.env.example`](.env.example). Copy
-`.env.example` → `.env`, fill in real values, and the converted Python
-flows can load them via `python-dotenv` / `os.environ`.
+for per-environment values (hostnames, credentials, OAuth secrets,
+etc.). These are intentionally left as placeholders — the Python
+code-generation agent reads them at conversion time and emits a
+matching `.env` template alongside the generated flow.
 
 ## Convert with talend2py
 
