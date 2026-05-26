@@ -1,0 +1,10 @@
+{
+  "invoiceId": "INV-2024-0042",
+  "customerName": "Acme Corp",
+  "invoiceTotal": 1250.00,
+  "currency": "USD",
+  "lineItems": [
+    {"sku": "WIDGET-A", "qty": 10, "unitPrice": 50.00},
+    {"sku": "GADGET-B", "qty": 5, "unitPrice": 150.00}
+  ]
+}
